@@ -1,0 +1,1135 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>笨猪猪的求生指南</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&family=Ma+Shan+Zheng&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --pink-light: #FFE4EC;
+            --pink: #FF8FAB;
+            --pink-dark: #FF5C8A;
+            --peach: #FFDAB9;
+            --cream: #FFF8F0;
+            --brown: #8B6F5E;
+            --brown-light: #C4A882;
+            --gold: #FFD700;
+            --white: #FFFFFF;
+            --shadow-pink: rgba(255, 143, 171, 0.3);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'ZCOOL KuaiLe', 'PingFang SC', sans-serif;
+            background: var(--cream);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* ===== 背景装饰 ===== */
+        .bg-layer {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .bg-blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(60px);
+            opacity: 0.4;
+            animation: blobFloat 8s ease-in-out infinite;
+        }
+
+        .bg-blob:nth-child(1) {
+            width: 300px; height: 300px;
+            background: var(--pink-light);
+            top: -50px; left: -80px;
+            animation-delay: 0s;
+        }
+        .bg-blob:nth-child(2) {
+            width: 250px; height: 250px;
+            background: var(--peach);
+            top: 30%; right: -60px;
+            animation-delay: -3s;
+        }
+        .bg-blob:nth-child(3) {
+            width: 200px; height: 200px;
+            background: #E8D5FF;
+            bottom: 10%; left: 20%;
+            animation-delay: -5s;
+        }
+
+        @keyframes blobFloat {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(20px, -20px) scale(1.05); }
+            66% { transform: translate(-15px, 15px) scale(0.95); }
+        }
+
+        /* ===== 飘落的爱心 ===== */
+        .hearts-container {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .floating-heart {
+            position: absolute;
+            top: -30px;
+            animation: heartFall linear infinite;
+            opacity: 0.6;
+            font-size: 20px;
+        }
+
+        @keyframes heartFall {
+            0% { transform: translateY(-30px) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.6; }
+            90% { opacity: 0.6; }
+            100% { transform: translateY(110vh) rotate(360deg); opacity: 0; }
+        }
+
+        /* ===== 主容器 ===== */
+        .main-container {
+            position: relative;
+            z-index: 2;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            padding-top: env(safe-area-inset-top, 20px);
+            padding-bottom: env(safe-area-inset-bottom, 20px);
+        }
+
+        /* ===== 一二布布角色区 ===== */
+        .character-area {
+            position: relative;
+            width: 300px;
+            height: 300px;
+            margin-bottom: 10px;
+        }
+
+        .yierbubu-img {
+            width: 240px;
+            height: 240px;
+            object-fit: contain;
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            animation: pigBounce 2s ease-in-out infinite;
+            filter: drop-shadow(0 8px 16px rgba(255, 143, 171, 0.25));
+            z-index: 3;
+        }
+
+        /* 一二布布图片轮播 */
+        .yierbubu-slides {
+            position: absolute;
+            width: 240px;
+            height: 240px;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 3;
+        }
+
+        .yierbubu-slide {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            opacity: 0;
+            transition: opacity 0.8s ease, transform 0.8s ease;
+            transform: scale(0.9);
+            filter: drop-shadow(0 8px 16px rgba(255, 143, 171, 0.25));
+        }
+
+        .yierbubu-slide.active {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .pig-character {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            right: -20px;
+            bottom: 0;
+            animation: pigBounce 2s ease-in-out infinite;
+            z-index: 2;
+            transform-origin: bottom center;
+        }
+
+        @keyframes pigBounce {
+            0%, 100% { transform: rotate(-3deg); }
+            50% { transform: rotate(3deg) translateY(-5px); }
+        }
+
+        .pig-body {
+            width: 80px;
+            height: 68px;
+            background: linear-gradient(135deg, #FFB6C1, #FF9AAE);
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            position: absolute;
+            bottom: 5px;
+            left: 50%;
+            transform: translateX(-50%);
+            box-shadow: 0 8px 20px rgba(255, 154, 174, 0.3);
+        }
+
+        .pig-face {
+            position: absolute;
+            width: 58px;
+            height: 46px;
+            background: linear-gradient(135deg, #FFC0CB, #FFB0C0);
+            border-radius: 50%;
+            top: 6px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .pig-ear {
+            position: absolute;
+            width: 20px;
+            height: 24px;
+            background: linear-gradient(135deg, #FF9AAE, #FF8FA0);
+            border-radius: 50% 50% 30% 30%;
+            top: -10px;
+        }
+        .pig-ear.left { left: 8px; transform: rotate(-20deg); }
+        .pig-ear.right { right: 8px; transform: rotate(20deg); }
+
+        .pig-eye {
+            position: absolute;
+            width: 10px;
+            height: 12px;
+            background: #333;
+            border-radius: 50%;
+            top: 14px;
+            animation: pigBlink 4s ease-in-out infinite;
+        }
+        .pig-eye.left { left: 12px; }
+        .pig-eye.right { right: 12px; }
+
+        .pig-eye::after {
+            content: '';
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: white;
+            border-radius: 50%;
+            top: 2px;
+            right: 2px;
+        }
+
+        @keyframes pigBlink {
+            0%, 45%, 55%, 100% { transform: scaleY(1); }
+            50% { transform: scaleY(0.1); }
+        }
+
+        .pig-nose {
+            position: absolute;
+            width: 20px;
+            height: 13px;
+            background: linear-gradient(135deg, #FF8FA0, #FF7F95);
+            border-radius: 50%;
+            bottom: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .pig-nose::before, .pig-nose::after {
+            content: '';
+            position: absolute;
+            width: 5px;
+            height: 4px;
+            background: #E0707F;
+            border-radius: 50%;
+            top: 4px;
+        }
+        .pig-nose::before { left: 3px; }
+        .pig-nose::after { right: 3px; }
+
+        .pig-mouth {
+            position: absolute;
+            bottom: 2px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 12px;
+            height: 6px;
+            border-bottom: 2px solid #E0707F;
+            border-radius: 0 0 50% 50%;
+        }
+
+        .pig-blush {
+            position: absolute;
+            width: 13px;
+            height: 8px;
+            background: rgba(255, 100, 130, 0.4);
+            border-radius: 50%;
+            top: 24px;
+        }
+        .pig-blush.left { left: 4px; }
+        .pig-blush.right { right: 4px; }
+
+        /* 小翅膀/小手 */
+        .pig-hand {
+            position: absolute;
+            width: 14px;
+            height: 18px;
+            background: linear-gradient(135deg, #FFB0C0, #FFA0B0);
+            border-radius: 50% 50% 40% 40%;
+            bottom: 18px;
+        }
+        .pig-hand.left { left: -3px; transform: rotate(15deg); animation: waveHand 1.5s ease-in-out infinite; }
+        .pig-hand.right { right: -3px; transform: rotate(-15deg); animation: waveHand 1.5s ease-in-out infinite reverse; }
+
+        @keyframes waveHand {
+            0%, 100% { transform: rotate(15deg); }
+            50% { transform: rotate(25deg); }
+        }
+
+        /* 眼泪效果 */
+        .pig-tear {
+            position: absolute;
+            width: 4px;
+            height: 7px;
+            background: linear-gradient(180deg, rgba(100, 180, 255, 0.8), rgba(100, 180, 255, 0));
+            border-radius: 50% 50% 50% 50% / 30% 30% 70% 70%;
+            top: 28px;
+            animation: tearDrop 2s ease-in infinite;
+            display: none;
+        }
+        .pig-tear.left { left: 16px; }
+        .pig-tear.right { right: 16px; animation-delay: 1s; }
+
+        .pig-tear.show { display: block; }
+
+        @keyframes tearDrop {
+            0% { transform: translateY(0); opacity: 1; }
+            100% { transform: translateY(30px); opacity: 0; }
+        }
+
+        /* 一二布布装饰文字 */
+        .yierbubu-badge {
+            position: absolute;
+            top: -10px;
+            right: -20px;
+            background: linear-gradient(135deg, var(--gold), #FFA500);
+            color: var(--brown);
+            font-size: 14px;
+            font-weight: bold;
+            padding: 6px 14px;
+            border-radius: 20px;
+            box-shadow: 0 3px 10px rgba(255, 165, 0, 0.3);
+            animation: badgePulse 2s ease-in-out infinite;
+            transform: rotate(10deg);
+            white-space: nowrap;
+            z-index: 5;
+        }
+
+        @keyframes badgePulse {
+            0%, 100% { transform: rotate(10deg) scale(1); }
+            50% { transform: rotate(10deg) scale(1.08); }
+        }
+
+        /* ===== 道歉文字区 ===== */
+        .message-area {
+            text-align: center;
+            margin-bottom: 25px;
+            max-width: 340px;
+        }
+
+        .message-title {
+            font-family: 'Ma Shan Zheng', cursive;
+            font-size: 28px;
+            color: var(--pink-dark);
+            margin-bottom: 12px;
+            text-shadow: 2px 2px 4px var(--shadow-pink);
+            animation: titlePop 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        @keyframes titlePop {
+            0% { transform: scale(0); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .message-text {
+            font-size: 16px;
+            color: var(--brown);
+            line-height: 1.8;
+            padding: 15px 20px;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 20px;
+            border: 2px dashed var(--pink);
+            backdrop-filter: blur(10px);
+            transition: all 0.5s ease;
+        }
+
+        /* ===== 按钮区 ===== */
+        .buttons-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            width: 100%;
+            max-width: 320px;
+        }
+
+        .btn {
+            border: none;
+            border-radius: 50px;
+            font-family: 'ZCOOL KuaiLe', sans-serif;
+            font-size: 18px;
+            padding: 14px 40px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            position: relative;
+            overflow: hidden;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        .btn::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .btn:active::after {
+            width: 300px;
+            height: 300px;
+        }
+
+        .btn-forgive {
+            background: linear-gradient(135deg, var(--pink), var(--pink-dark));
+            color: white;
+            box-shadow: 0 6px 20px var(--shadow-pink);
+            font-size: 20px;
+            padding: 16px 50px;
+            animation: forgiveGlow 2s ease-in-out infinite;
+        }
+
+        @keyframes forgiveGlow {
+            0%, 100% { box-shadow: 0 6px 20px var(--shadow-pink); }
+            50% { box-shadow: 0 6px 35px rgba(255, 92, 138, 0.5); }
+        }
+
+        .btn-forgive:active {
+            transform: scale(0.95);
+        }
+
+        .btn-not-forgive {
+            background: linear-gradient(135deg, #E8E8E8, #D0D0D0);
+            color: #999;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-not-forgive:hover {
+            transform: scale(0.95);
+        }
+
+        /* ===== 成功页面 ===== */
+        .success-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            z-index: 100;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 30px;
+        }
+
+        .success-overlay.show {
+            display: flex;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .success-heart {
+            font-size: 80px;
+            animation: heartBeat 1s ease-in-out infinite;
+            margin-bottom: 20px;
+        }
+
+        @keyframes heartBeat {
+            0%, 100% { transform: scale(1); }
+            25% { transform: scale(1.15); }
+            50% { transform: scale(1); }
+            75% { transform: scale(1.1); }
+        }
+
+        .success-title {
+            font-family: 'Ma Shan Zheng', cursive;
+            font-size: 36px;
+            color: var(--pink-dark);
+            margin-bottom: 15px;
+            animation: titlePop 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55) 0.3s both;
+        }
+
+        .success-message {
+            font-size: 18px;
+            color: var(--brown);
+            line-height: 2;
+            max-width: 300px;
+            animation: titlePop 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55) 0.6s both;
+        }
+
+        .success-pig {
+            font-size: 60px;
+            margin-top: 20px;
+            animation: pigBounce 2s ease-in-out infinite;
+        }
+
+        .success-fireworks {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+        }
+
+        /* ===== 星星粒子 ===== */
+        .sparkle {
+            position: absolute;
+            pointer-events: none;
+            animation: sparkleAnim 1s ease-out forwards;
+        }
+
+        @keyframes sparkleAnim {
+            0% { transform: scale(0) rotate(0deg); opacity: 1; }
+            100% { transform: scale(1) rotate(180deg); opacity: 0; }
+        }
+
+        /* ===== 进度条 ===== */
+        .forgiveness-meter {
+            width: 100%;
+            max-width: 280px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .meter-label {
+            font-size: 14px;
+            color: var(--brown-light);
+            margin-bottom: 6px;
+        }
+
+        .meter-bar {
+            width: 100%;
+            height: 12px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 10px;
+            overflow: hidden;
+            border: 2px solid var(--pink-light);
+        }
+
+        .meter-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--pink), #FF6B9D, var(--pink-dark));
+            border-radius: 10px;
+            transition: width 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            width: 0%;
+        }
+
+        /* ===== 拒绝次数计数 ===== */
+        .reject-counter {
+            font-size: 13px;
+            color: var(--brown-light);
+            margin-top: 5px;
+            opacity: 0.8;
+        }
+
+        /* ===== 小装饰 ===== */
+        .deco-stars {
+            position: absolute;
+            font-size: 16px;
+            animation: twinkle 2s ease-in-out infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; transform: scale(0.8); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
+
+        /* ===== 底部一二布布装饰 ===== */
+        .bubu-parade {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 15px;
+            padding: 10px 0;
+            overflow: hidden;
+        }
+
+        .bubu-parade img {
+            width: 55px;
+            height: 55px;
+            object-fit: contain;
+            border-radius: 50%;
+            border: 2px solid var(--pink-light);
+            background: rgba(255, 255, 255, 0.8);
+            padding: 4px;
+            animation: paradeFloat 3s ease-in-out infinite;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+        }
+
+        .bubu-parade img:nth-child(2) { animation-delay: -0.5s; }
+        .bubu-parade img:nth-child(3) { animation-delay: -1s; }
+        .bubu-parade img:nth-child(4) { animation-delay: -1.5s; }
+        .bubu-parade img:nth-child(5) { animation-delay: -2s; }
+
+        @keyframes paradeFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        /* ===== 成功页面熊熊 ===== */
+        .success-bubu {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 15px 0;
+            animation: titlePop 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55) 0.9s both;
+        }
+
+        .success-bubu img {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            animation: pigBounce 2s ease-in-out infinite;
+            filter: drop-shadow(0 4px 8px rgba(255, 143, 171, 0.3));
+        }
+
+        .success-bubu img:nth-child(2) { animation-delay: -1s; }
+
+        /* ===== 响应式 ===== */
+        @media (max-width: 380px) {
+            .message-title { font-size: 24px; }
+            .message-text { font-size: 14px; padding: 12px 16px; }
+            .btn-forgive { font-size: 18px; padding: 14px 40px; }
+            .character-area { width: 260px; height: 260px; }
+            .yierbubu-slides { width: 200px; height: 200px; }
+            .pig-character { width: 80px; height: 80px; }
+        }
+
+        @media (min-height: 800px) {
+            .main-container { justify-content: center; gap: 10px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- 背景层 -->
+<div class="bg-layer">
+    <div class="bg-blob"></div>
+    <div class="bg-blob"></div>
+    <div class="bg-blob"></div>
+</div>
+
+<!-- 飘落爱心 -->
+<div class="hearts-container" id="heartsContainer"></div>
+
+<!-- 主内容 -->
+<div class="main-container">
+
+    <!-- 一二布布角色 -->
+    <div class="character-area">
+        <div class="yierbubu-badge">✨ 肉肉嘟猪 ✨</div>
+        <!-- 一二布布熊熊图片（每阶段换一张） -->
+        <div class="yierbubu-slides" id="bubuSlides">
+            <img class="yierbubu-slide active" src="images/bubu4.jpg" alt="一二布布抱抱">
+            <img class="yierbubu-slide" src="images/new1.jpg" alt="一二布布樱花桥">
+            <img class="yierbubu-slide" src="images/new2.jpg" alt="一二布布赏花">
+            <img class="yierbubu-slide" src="images/new16.jpg" alt="一二布布罐头电话">
+            <img class="yierbubu-slide" src="images/new4.jpg" alt="一二布布牵手气球">
+            <img class="yierbubu-slide" src="images/new5.jpg" alt="一二布布出游">
+            <img class="yierbubu-slide" src="images/new6.jpg" alt="一二布布日常">
+            <img class="yierbubu-slide" src="images/new7.jpg" alt="一二布布拍立得">
+            <img class="yierbubu-slide" src="images/new8.jpg" alt="一二布布月下">
+            <img class="yierbubu-slide" src="images/bubu1.jpg" alt="一二布布烤肉">
+            <img class="yierbubu-slide" src="images/new10.jpg" alt="一二布布游乐园">
+            <img class="yierbubu-slide" src="images/new11.jpg" alt="一二布布奶茶">
+            <img class="yierbubu-slide" src="images/new12.jpg" alt="一二布布吃西瓜">
+            <img class="yierbubu-slide" src="images/new13.jpg" alt="一二布布卧室">
+        </div>
+        <div class="pig-character" id="pigCharacter">
+            <div class="pig-body">
+                <div class="pig-face">
+                    <div class="pig-ear left"></div>
+                    <div class="pig-ear right"></div>
+                    <div class="pig-eye left"></div>
+                    <div class="pig-eye right"></div>
+                    <div class="pig-blush left"></div>
+                    <div class="pig-blush right"></div>
+                    <div class="pig-nose"></div>
+                    <div class="pig-mouth"></div>
+                    <div class="pig-tear left" id="tearLeft"></div>
+                    <div class="pig-tear right" id="tearRight"></div>
+                </div>
+                <div class="pig-hand left"></div>
+                <div class="pig-hand right"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 道歉文字 -->
+    <div class="message-area">
+        <div class="message-title" id="messageTitle">🐷 小肥猪来道歉啦！</div>
+        <div class="message-text" id="messageText">
+            亲爱的宝贝，小肥猪知道自己错了～<br>
+            请问你可以原谅这只笨笨的小肥猪吗？🥺
+        </div>
+    </div>
+
+    <!-- 原谅进度 -->
+    <div class="forgiveness-meter">
+        <div class="meter-label" id="meterLabel">💕 小肥猪的诚意值</div>
+        <div class="meter-bar">
+            <div class="meter-fill" id="meterFill"></div>
+        </div>
+        <div class="reject-counter" id="rejectCounter"></div>
+    </div>
+
+    <!-- 按钮 -->
+    <div class="buttons-area" id="buttonsArea">
+        <button class="btn btn-forgive" id="btnForgive" onclick="forgive()">💕 原谅小肥猪</button>
+        <button class="btn btn-not-forgive" id="btnNotForgive" onclick="notForgive()">不原谅</button>
+    </div>
+
+    <!-- 底部一二布布小熊装饰 -->
+    <div class="bubu-parade">
+        <img src="images/bubu4.jpg" alt="一二布布">
+        <img src="images/bubu2.jpg" alt="一二布布">
+        <img src="images/bubu5.jpg" alt="一二布布">
+        <img src="images/bubu6.jpg" alt="一二布布">
+        <img src="images/bubu3.jpg" alt="一二布布">
+    </div>
+
+</div>
+
+<!-- 成功页面 -->
+<div class="success-overlay" id="successOverlay">
+    <div class="success-fireworks" id="fireworks"></div>
+    <div class="success-heart">💖</div>
+    <div class="success-title">你原谅小肥猪啦！</div>
+    <!-- 一二布布庆祝 -->
+    <div class="success-bubu">
+        <img src="images/bubu4.jpg" alt="一二布布庆祝">
+        <img src="images/bubu1.jpg" alt="一二布布庆祝">
+    </div>
+    <div class="success-message">
+        世界上最幸福的事，<br>
+        就是肉宝的笑容～<br><br>
+        只想与肉宝永远在一起<br>
+        永远爱肉宝 💕
+    </div>
+    <div class="success-pig">🐷❤️🐷</div>
+</div>
+
+<script>
+    // ===== 状态管理 =====
+    let rejectCount = 0;
+    const maxRejects = 12; // 达到这个次数后，不原谅按钮消失
+
+    // ===== 道歉阶段配置 =====
+    const stages = [
+        {
+            title: '🐷 小肥猪来道歉啦！',
+            text: '亲爱的宝贝，小肥猪知道自己错了～<br>请问你可以原谅这只笨笨的小肥猪吗？🥺',
+            forgiveBtn: '💕 原谅小肥猪',
+            notBtn: '不原谅',
+            showTears: false,
+            meterPercent: 0
+        },
+        {
+            title: '🥺 小肥猪好伤心...',
+            text: '呜呜呜...小肥猪真的知道错了嘛～<br>再给小肥猪一次机会好不好？😢',
+            forgiveBtn: '💕 好吧原谅你',
+            notBtn: '还是不原谅',
+            showTears: true,
+            meterPercent: 8
+        },
+        {
+            title: '😭 小肥猪哭了...',
+            text: '肥肉嘟嘟说小肥猪已经哭成小河了～<br>水都快把小肥猪淹没了啦！🌊',
+            forgiveBtn: '💕 别哭了原谅你',
+            notBtn: '哭也没用',
+            showTears: true,
+            meterPercent: 17
+        },
+        {
+            title: '🥺 小肥猪在反省...',
+            text: '小肥猪已经面壁思过了！<br>小笨布布可以作证，真的有在反省！🧱',
+            forgiveBtn: '💕 看你态度好原谅你',
+            notBtn: '反省不够深刻',
+            showTears: true,
+            meterPercent: 25
+        },
+        {
+            title: '🐷 小肥猪在努力...',
+            text: '小肥猪决定减肥来表示诚意！<br>从今天起只吃...三顿饭！💪',
+            forgiveBtn: '💕 哈哈好吧原谅你',
+            notBtn: '这算什么诚意',
+            showTears: true,
+            meterPercent: 33
+        },
+        {
+            title: '💝 小肥猪的承诺',
+            text: '小笨布布和小肥猪一起发誓：<br>以后再也不惹肉宝生气了！🤞',
+            forgiveBtn: '💕 相信你原谅你',
+            notBtn: '上次也是这么说的',
+            showTears: true,
+            meterPercent: 42
+        },
+        {
+            title: '🌈 小肥猪变彩虹了',
+            text: '小肥猪已经变成彩虹猪了！<br>再不原谅就要变成独角兽了！🦄',
+            forgiveBtn: '💕 原谅彩虹猪',
+            notBtn: '变成独角兽再说',
+            showTears: true,
+            meterPercent: 50
+        },
+        {
+            title: '🎂 小肥猪的蛋糕',
+            text: '小肥猪给你烤了一个爱心蛋糕！<br>虽然烤糊了...但是心意是真的！🍰',
+            forgiveBtn: '💕 心意收到原谅你',
+            notBtn: '烤糊了不收',
+            showTears: true,
+            meterPercent: 58
+        },
+        {
+            title: '🎵 小肥猪在唱歌',
+            text: '小笨布布教小肥猪唱了一首歌：<br>"老婆喜欢的～买！老婆讨厌的～改！老婆最大～老婆最好！"🎤',
+            forgiveBtn: '💕 唱得还行原谅你',
+            notBtn: '跑调了不原谅',
+            showTears: true,
+            meterPercent: 67
+        },
+        {
+            title: '🌸 小肥猪的花园',
+            text: '小肥猪为你种了一盆子的花！<br>肥猪天天浇水水～每天浇！🌷',
+            forgiveBtn: '💕 花好漂亮原谅你',
+            notBtn: '花都枯了才浇',
+            showTears: true,
+            meterPercent: 75
+        },
+        {
+            title: '🌙 小肥猪的星星',
+            text: '小肥猪爬上屋顶给你摘星星了！<br>小肥肉在下面接着哦～！⭐',
+            forgiveBtn: '💕 小心点原谅你',
+            notBtn: '那不是灯泡吗',
+            showTears: true,
+            meterPercent: 83
+        },
+        {
+            title: '🆘 小肥猪最后的请求',
+            text: '小肥猪已经用尽了所有办法...<br>我真的好爱好爱你啊宝宝 💗',
+            forgiveBtn: '💕 我也爱你原谅你！',
+            notBtn: '...',
+            showTears: true,
+            meterPercent: 92
+        },
+        {
+            title: '💗 只能选原谅啦！',
+            text: '肥猪把"不原谅"按钮藏起来了！<br>小肥猪会好好爱肥肉的呀～<br>小笨礼物登场～ 🐷💕',
+            forgiveBtn: '💕 原谅小肥猪！',
+            notBtn: null, // 按钮消失！
+            showTears: true,
+            meterPercent: 100
+        }
+    ];
+
+    // ===== DOM 元素 =====
+    const messageTitle = document.getElementById('messageTitle');
+    const messageText = document.getElementById('messageText');
+    const btnForgive = document.getElementById('btnForgive');
+    const btnNotForgive = document.getElementById('btnNotForgive');
+    const meterFill = document.getElementById('meterFill');
+    const meterLabel = document.getElementById('meterLabel');
+    const rejectCounter = document.getElementById('rejectCounter');
+    const tearLeft = document.getElementById('tearLeft');
+    const tearRight = document.getElementById('tearRight');
+    const successOverlay = document.getElementById('successOverlay');
+
+    // ===== 不原谅逻辑 =====
+    function notForgive() {
+        rejectCount++;
+        if (rejectCount >= maxRejects) {
+            // 最后阶段：不原谅按钮消失
+            updateStage(maxRejects);
+            return;
+        }
+        updateStage(rejectCount);
+
+        // 随机让不原谅按钮跑掉（从第3次开始）
+        if (rejectCount >= 3) {
+            runAwayButton();
+        }
+
+        // 添加抖动效果
+        document.body.style.animation = 'none';
+        document.body.offsetHeight; // trigger reflow
+        document.body.style.animation = 'shake 0.5s ease';
+    }
+
+    function updateStage(stageIndex) {
+        const stage = stages[Math.min(stageIndex, stages.length - 1)];
+
+        // 切换一二布布图片
+        switchBubuImage(stageIndex);
+
+        // 更新标题和文字（带动画）
+        messageTitle.style.animation = 'none';
+        messageText.style.animation = 'none';
+        messageTitle.offsetHeight;
+
+        messageTitle.textContent = stage.title;
+        messageText.innerHTML = stage.text;
+        btnForgive.textContent = stage.forgiveBtn;
+
+        messageTitle.style.animation = 'titlePop 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55)';
+        messageText.style.animation = 'titlePop 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55) 0.1s both';
+
+        // 更新不原谅按钮
+        if (stage.notBtn === null) {
+            btnNotForgive.style.display = 'none';
+            btnForgive.style.width = '100%';
+            btnForgive.style.maxWidth = '300px';
+        } else {
+            btnNotForgive.textContent = stage.notBtn;
+            // 逐渐缩小不原谅按钮
+            const scale = Math.max(0.6, 1 - rejectCount * 0.03);
+            btnNotForgive.style.transform = `scale(${scale})`;
+            btnNotForgive.style.opacity = Math.max(0.4, 1 - rejectCount * 0.05);
+        }
+
+        // 更新进度条
+        meterFill.style.width = stage.meterPercent + '%';
+
+        // 更新眼泪
+        if (stage.showTears) {
+            tearLeft.classList.add('show');
+            tearRight.classList.add('show');
+        }
+
+        // 更新拒绝计数
+        if (rejectCount > 0) {
+            const tips = [
+                '小肥猪已经道了 ' + rejectCount + ' 次歉了...',
+                '第 ' + rejectCount + ' 次被拒绝了呜呜呜',
+                '小肥猪不放弃！已尝试 ' + rejectCount + ' 次',
+                '一二布布说：都 ' + rejectCount + ' 次了就原谅吧',
+                '小肥猪的倔强：第 ' + rejectCount + ' 次尝试中！'
+            ];
+            rejectCounter.textContent = tips[Math.min(rejectCount - 1, tips.length - 1)];
+        }
+
+        // 更新进度条标签
+        if (rejectCount >= 8) {
+            meterLabel.textContent = '💗 小肥猪的诚意值（快满了！）';
+        } else if (rejectCount >= 5) {
+            meterLabel.textContent = '💕 小肥猪的诚意值（在努力中）';
+        }
+    }
+
+    // ===== 不原谅按钮逃跑 =====
+    function runAwayButton() {
+        const btn = btnNotForgive;
+        const rect = btn.getBoundingClientRect();
+        const maxX = window.innerWidth - rect.width - 20;
+        const maxY = window.innerHeight - rect.height - 20;
+
+        // 随机位置
+        const newX = Math.random() * maxX;
+        const newY = Math.random() * maxY;
+
+        // 使用固定定位让按钮跑到随机位置
+        btn.style.position = 'fixed';
+        btn.style.left = newX + 'px';
+        btn.style.top = newY + 'px';
+        btn.style.zIndex = '50';
+        btn.style.transition = 'all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55)';
+
+        // 3秒后恢复原位
+        setTimeout(() => {
+            btn.style.position = '';
+            btn.style.left = '';
+            btn.style.top = '';
+            btn.style.zIndex = '';
+        }, 2500);
+    }
+
+    // ===== 原谅逻辑 =====
+    function forgive() {
+        // 创建满屏爱心
+        createLoveExplosion();
+
+        // 显示成功页面
+        setTimeout(() => {
+            successOverlay.classList.add('show');
+            startFireworks();
+        }, 500);
+    }
+
+    // ===== 爱心爆炸效果 =====
+    function createLoveExplosion() {
+        const emojis = ['💕', '💖', '💗', '❤️', '💘', '💝', '🐷', '✨', '🌸'];
+        for (let i = 0; i < 30; i++) {
+            setTimeout(() => {
+                const heart = document.createElement('div');
+                heart.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+                heart.style.cssText = `
+                    position: fixed;
+                    left: ${Math.random() * 100}vw;
+                    top: ${Math.random() * 100}vh;
+                    font-size: ${20 + Math.random() * 30}px;
+                    z-index: 99;
+                    pointer-events: none;
+                    animation: sparkleAnim ${1 + Math.random()}s ease-out forwards;
+                `;
+                document.body.appendChild(heart);
+                setTimeout(() => heart.remove(), 2000);
+            }, i * 50);
+        }
+    }
+
+    // ===== 烟花效果 =====
+    function startFireworks() {
+        const container = document.getElementById('fireworks');
+        const colors = ['#FF6B9D', '#FFD700', '#FF8FAB', '#FF5C8A', '#FFA500', '#FF69B4'];
+
+        function createFirework() {
+            const x = Math.random() * 100;
+            const y = Math.random() * 100;
+            const color = colors[Math.floor(Math.random() * colors.length)];
+
+            for (let i = 0; i < 12; i++) {
+                const particle = document.createElement('div');
+                const angle = (i / 12) * Math.PI * 2;
+                const distance = 40 + Math.random() * 60;
+                const tx = Math.cos(angle) * distance;
+                const ty = Math.sin(angle) * distance;
+
+                particle.style.cssText = `
+                    position: absolute;
+                    left: ${x}%;
+                    top: ${y}%;
+                    width: 8px;
+                    height: 8px;
+                    background: ${color};
+                    border-radius: 50%;
+                    pointer-events: none;
+                    animation: fireworkParticle 1s ease-out forwards;
+                    --tx: ${tx}px;
+                    --ty: ${ty}px;
+                `;
+                container.appendChild(particle);
+                setTimeout(() => particle.remove(), 1000);
+            }
+        }
+
+        // 添加烟花动画样式
+        if (!document.getElementById('fireworkStyle')) {
+            const style = document.createElement('style');
+            style.id = 'fireworkStyle';
+            style.textContent = `
+                @keyframes fireworkParticle {
+                    0% { transform: translate(0, 0) scale(1); opacity: 1; }
+                    100% { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; }
+                }
+                @keyframes shake {
+                    0%, 100% { transform: translateX(0); }
+                    25% { transform: translateX(-5px); }
+                    75% { transform: translateX(5px); }
+                }
+            `;
+            document.head.appendChild(style);
+        }
+
+        // 持续放烟花
+        let count = 0;
+        const interval = setInterval(() => {
+            createFirework();
+            count++;
+            if (count > 15) clearInterval(interval);
+        }, 400);
+    }
+
+    // ===== 飘落爱心 =====
+    function createFloatingHearts() {
+        const container = document.getElementById('heartsContainer');
+        const hearts = ['💕', '💗', '💖', '❤️', '🩷', '🌸', '✨', '🐷'];
+
+        function addHeart() {
+            const heart = document.createElement('div');
+            heart.className = 'floating-heart';
+            heart.textContent = hearts[Math.floor(Math.random() * hearts.length)];
+            heart.style.left = Math.random() * 100 + 'vw';
+            heart.style.fontSize = (14 + Math.random() * 16) + 'px';
+            heart.style.animationDuration = (6 + Math.random() * 8) + 's';
+            heart.style.animationDelay = Math.random() * 2 + 's';
+            container.appendChild(heart);
+
+            setTimeout(() => heart.remove(), 16000);
+        }
+
+        // 初始添加几个
+        for (let i = 0; i < 5; i++) {
+            setTimeout(addHeart, i * 800);
+        }
+
+        // 持续添加
+        setInterval(addHeart, 2000);
+    }
+
+    // ===== 初始化 =====
+    document.addEventListener('DOMContentLoaded', () => {
+        createFloatingHearts();
+    });
+
+    // ===== 切换一二布布图片（跟随阶段） =====
+    function switchBubuImage(stageIndex) {
+        const slides = document.querySelectorAll('.yierbubu-slide');
+        if (slides.length === 0) return;
+        const idx = stageIndex % slides.length;
+        slides.forEach(s => s.classList.remove('active'));
+        slides[idx].classList.add('active');
+    }
+</script>
+
+</body>
+</html>
